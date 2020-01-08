@@ -1,15 +1,9 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace NzbDrone.Core.Indexers.BroadcastheNet
 {
     public class BroadcastheNetTorrentQuery
     {
-        public BroadcastheNetTorrentQuery()
-        {
-            Origin = new List<string>();
-        }
-        
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Id { get; set; }
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -27,7 +21,7 @@ namespace NzbDrone.Core.Indexers.BroadcastheNet
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Resolution { get; set; }
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<string> Origin { get; set; }
+        public string Origin { get; set; }
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Hash { get; set; }
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]

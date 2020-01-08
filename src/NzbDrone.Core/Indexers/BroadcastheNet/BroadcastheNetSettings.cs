@@ -23,10 +23,6 @@ namespace NzbDrone.Core.Indexers.BroadcastheNet
         {
             BaseUrl = "http://api.broadcasthe.net/";
             MinimumSeeders = IndexerDefaults.MINIMUM_SEEDERS;
-            IncludeSceneReleases = true;
-            IncludeP2PReleases = true;
-            IncludeUserReleases = true;
-            IncludeInternalReleases = true;
         }
 
         [FieldDefinition(0, Label = "API URL", Advanced = true, HelpText = "Do not change this unless you know what you're doing. Since your API key will be sent to that host.")]
@@ -41,17 +37,17 @@ namespace NzbDrone.Core.Indexers.BroadcastheNet
         [FieldDefinition(3)]
         public SeedCriteriaSettings SeedCriteria { get; } = new SeedCriteriaSettings();
 
-        [FieldDefinition(4, Type = FieldType.Checkbox, Label = "Include Scene Releases", Advanced = true, HelpText = "Include releases with Scene origin in results")]
-        public bool IncludeSceneReleases { get; set; }
+        [FieldDefinition(4, Type = FieldType.Checkbox, Label = "Reject Scene Releases", Advanced = true, HelpText = "Reject releases with Scene origin")]
+        public bool RejectSceneReleases { get; set; }
 
-        [FieldDefinition(5, Type = FieldType.Checkbox, Label = "Include P2P Releases", Advanced = true, HelpText = "Include releases with P2P origin in results")]
-        public bool IncludeP2PReleases { get; set; }
+        [FieldDefinition(5, Type = FieldType.Checkbox, Label = "Reject P2P Releases", Advanced = true, HelpText = "Reject releases with P2P origin")]
+        public bool RejectP2PReleases { get; set; }
 
-        [FieldDefinition(6, Type = FieldType.Checkbox, Label = "Include User Releases", Advanced = true, HelpText = "Include releases with User origin in results")]
-        public bool IncludeUserReleases { get; set; }
+        [FieldDefinition(6, Type = FieldType.Checkbox, Label = "Reject User Releases", Advanced = true, HelpText = "Reject releases with User origin")]
+        public bool RejectUserReleases { get; set; }
 
-        [FieldDefinition(7, Type = FieldType.Checkbox, Label = "Include Internal Releases", Advanced = true, HelpText = "Include releases with Internal origin in results")]
-        public bool IncludeInternalReleases { get; set; }
+        [FieldDefinition(7, Type = FieldType.Checkbox, Label = "Reject Internal Releases", Advanced = true, HelpText = "Reject releases with Internal origin")]
+        public bool RejectInternalReleases { get; set; }
 
         public NzbDroneValidationResult Validate()
         {
