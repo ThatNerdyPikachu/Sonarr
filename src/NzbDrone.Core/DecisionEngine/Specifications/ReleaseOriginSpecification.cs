@@ -1,10 +1,11 @@
-﻿using System.Runtime.InteropServices.WindowsRuntime;
+﻿using System;
 using NLog;
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Indexers;
 using NzbDrone.Core.Indexers.BroadcastheNet;
 using NzbDrone.Core.IndexerSearch.Definitions;
 using NzbDrone.Core.Parser.Model;
+using NzbDrone.Core.Tags;
 
 namespace NzbDrone.Core.DecisionEngine.Specifications
 {
@@ -13,10 +14,13 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
         private readonly IIndexerFactory _indexerFactory;
         private readonly Logger _logger;
 
-        public ReleaseOriginSpecifciation(IIndexerFactory indexerFactory, Logger logger)
+        private readonly ITagService _tagService;
+
+        public ReleaseOriginSpecifciation(IIndexerFactory indexerFactory, Logger logger, ITagService tagService)
         {
             _indexerFactory = indexerFactory;
             _logger = logger;
+            _tagService = tagService;
         }
 
         public SpecificationPriority Priority => SpecificationPriority.Default;
@@ -25,6 +29,14 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
 
         public Decision IsSatisfiedBy(RemoteEpisode remoteEpisode, SearchCriteriaBase searchCriteria)
         {
+            foreach (var tag in remoteEpisode.Series.Tags)
+            {
+                if (_tagService.GetTag(tag).Label.ToLower() == "skip-origin")
+                {
+                    return Decision.Accept();
+                }
+            }
+            
             var torrentInfo = remoteEpisode.Release as TorrentInfo;
 
             if (torrentInfo == null || torrentInfo.IndexerId == 0)
