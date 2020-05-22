@@ -222,9 +222,13 @@ class QueueRow extends Component {
             if (name === 'quality') {
               return (
                 <TableRowCell key={name}>
-                  <EpisodeQuality
-                    quality={quality}
-                  />
+                  {
+                    quality ?
+                      <EpisodeQuality
+                        quality={quality}
+                      /> :
+                      null
+                  }
                 </TableRowCell>
               );
             }
@@ -352,7 +356,7 @@ class QueueRow extends Component {
         <RemoveQueueItemModal
           isOpen={isRemoveQueueItemModalOpen}
           sourceTitle={title}
-          canIgnore={!!(series && episode)}
+          canIgnore={!!series}
           onRemovePress={this.onRemoveQueueItemModalConfirmed}
           onModalClose={this.onRemoveQueueItemModalClose}
         />

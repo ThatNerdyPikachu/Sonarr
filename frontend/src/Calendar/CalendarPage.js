@@ -3,9 +3,10 @@ import React, { Component } from 'react';
 import { align, icons } from 'Helpers/Props';
 import PageContent from 'Components/Page/PageContent';
 import Measure from 'Components/Measure';
-import PageContentBodyConnector from 'Components/Page/PageContentBodyConnector';
+import PageContentBody from 'Components/Page/PageContentBody';
 import PageToolbar from 'Components/Page/Toolbar/PageToolbar';
 import PageToolbarSection from 'Components/Page/Toolbar/PageToolbarSection';
+import PageToolbarSeparator from 'Components/Page/Toolbar/PageToolbarSeparator';
 import PageToolbarButton from 'Components/Page/Toolbar/PageToolbarButton';
 import FilterMenu from 'Components/Menu/FilterMenu';
 import NoSeries from 'Series/NoSeries';
@@ -76,8 +77,10 @@ class CalendarPage extends Component {
       filters,
       hasSeries,
       missingEpisodeIds,
+      isRssSyncExecuting,
       isSearchingForMissing,
       useCurrentPage,
+      onRssSyncPress,
       onFilterSelect
     } = this.props;
 
@@ -97,6 +100,15 @@ class CalendarPage extends Component {
               label="iCal Link"
               iconName={icons.CALENDAR}
               onPress={this.onGetCalendarLinkPress}
+            />
+
+            <PageToolbarSeparator />
+
+            <PageToolbarButton
+              label="RSS Sync"
+              iconName={icons.RSS}
+              isSpinning={isRssSyncExecuting}
+              onPress={onRssSyncPress}
             />
 
             <PageToolbarButton
@@ -126,7 +138,7 @@ class CalendarPage extends Component {
           </PageToolbarSection>
         </PageToolbar>
 
-        <PageContentBodyConnector
+        <PageContentBody
           className={styles.calendarPageBody}
           innerClassName={styles.calendarInnerPageBody}
         >
@@ -147,7 +159,7 @@ class CalendarPage extends Component {
             hasSeries &&
               <LegendConnector />
           }
-        </PageContentBodyConnector>
+        </PageContentBody>
 
         <CalendarLinkModal
           isOpen={isCalendarLinkModalOpen}
@@ -168,10 +180,12 @@ CalendarPage.propTypes = {
   filters: PropTypes.arrayOf(PropTypes.object).isRequired,
   hasSeries: PropTypes.bool.isRequired,
   missingEpisodeIds: PropTypes.arrayOf(PropTypes.number).isRequired,
+  isRssSyncExecuting: PropTypes.bool.isRequired,
   isSearchingForMissing: PropTypes.bool.isRequired,
   useCurrentPage: PropTypes.bool.isRequired,
   onSearchMissingPress: PropTypes.func.isRequired,
   onDaysCountChange: PropTypes.func.isRequired,
+  onRssSyncPress: PropTypes.func.isRequired,
   onFilterSelect: PropTypes.func.isRequired
 };
 

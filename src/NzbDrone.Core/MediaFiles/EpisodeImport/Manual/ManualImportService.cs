@@ -105,11 +105,25 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport.Manual
         private List<ManualImportItem> ProcessFolder(string rootFolder, string baseFolder, string downloadId, int? seriesId, bool filterExistingFiles)
         {
             DownloadClientItem downloadClientItem = null;
+            Series series = null;
+
             var directoryInfo = new DirectoryInfo(baseFolder);
 
-            var series = seriesId.HasValue ?
-                _seriesService.GetSeries(seriesId.Value) :
-                _parsingService.GetSeries(directoryInfo.Name);
+            if (seriesId.HasValue)
+            {
+                series = _seriesService.GetSeries(seriesId.Value);
+            }
+            else
+            {
+                try
+                {
+                    series = _parsingService.GetSeries(directoryInfo.Name);
+                }
+                catch (MultipleSeriesFoundException e)
+                {
+                    _logger.Warn(e, "Unable to find series from title");
+                }
+            }
 
             if (downloadId.IsNotNullOrWhiteSpace())
             {
@@ -124,8 +138,12 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport.Manual
 
             if (series == null)
             {
-                var files = _diskScanService.FilterFiles(baseFolder, _diskScanService.GetVideoFiles(baseFolder, false));
-                var subfolders = _diskScanService.FilterFiles(baseFolder, _diskProvider.GetDirectories(baseFolder));
+                // Filter paths based on the rootFolder, so files in subfolders that should be ignored are ignored.
+                // It will lead to some extra directories being checked for files, but it saves the processing of them and is cleaner than
+                // teaching FilterPaths to know whether it's processing a file or a folder and changing it's filtering based on that.
+
+                var files = _diskScanService.FilterPaths(rootFolder, _diskScanService.GetVideoFiles(baseFolder, false));
+                var subfolders = _diskScanService.FilterPaths(rootFolder, _diskProvider.GetDirectories(baseFolder));
 
                 var processedFiles = files.Select(file => ProcessFile(rootFolder, baseFolder, file, downloadId));
                 var processedFolders = subfolders.SelectMany(subfolder => ProcessFolder(rootFolder, subfolder, downloadId, null, filterExistingFiles));
@@ -346,7 +364,12 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport.Manual
                     }
                 }
 
-                if (groupedTrackedDownload.Select(c => c.ImportResult).Count(c => c.Result == ImportResultType.Imported) >= Math.Max(1, trackedDownload.RemoteEpisode.Episodes.Count))
+                var allEpisodesImported = groupedTrackedDownload.Select(c => c.ImportResult)
+                                                                    .Where(c => c.Result == ImportResultType.Imported)
+                                                                   .SelectMany(c => c.ImportDecision.LocalEpisode.Episodes).Count() >= 
+                                                                                Math.Max(1, trackedDownload.RemoteEpisode.Episodes.Count);
+
+                if (allEpisodesImported)
                 {
                     trackedDownload.State = TrackedDownloadState.Imported;
                     _eventAggregator.PublishEvent(new DownloadCompletedEvent(trackedDownload));
